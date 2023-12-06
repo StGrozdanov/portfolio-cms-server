@@ -1,0 +1,30 @@
+issues:
+  exclude-rules:
+    - path: _test\.go # disable some linters on test files
+      linters:
+        - gocyclo
+        - gosec
+        - dupl
+
+    # Exclude some gosec messages project-wide
+    - linters:
+        - gosec
+      text: "weak cryptographic primitive"
+  include:
+    - EXC0012  # EXC0012 revive: Annoying issue about not having a comment. The rare codebase has such comments
+    - EXC0014  # EXC0014 revive: Annoying issue about not having a comment. The rare codebase has such comments
+
+linters:
+  enable:
+    - funlen
+    - revive
+
+linters-settings:
+  funlen:
+    ignore-comments: true
+    lines: 50
+  revive:
+    rules:
+      - name: exported
+        arguments:
+          - disableStutteringCheck
