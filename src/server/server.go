@@ -3,7 +3,7 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"portfolio-cms-server/server/handlers"
+	handlers2 "portfolio-cms-server/server/handlers"
 	"portfolio-cms-server/server/interceptors"
 	"portfolio-cms-server/server/middlewares"
 	"portfolio-cms-server/utils"
@@ -20,8 +20,8 @@ func setupRouter() (router *gin.Engine) {
 // Run defines the router endpoints and starts the server
 func Run() {
 	router := setupRouter()
-	router.GET("/healths", handlers.HealthCheck)
-	router.GET("/metrics", handlers.Metrics)
+	router.GET("/healths", handlers2.HealthCheck)
+	router.GET("/metrics", handlers2.Metrics)
 
 	err := router.Run()
 	if err != nil {

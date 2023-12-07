@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/cenkalti/backoff/v4"
 	log "github.com/sirupsen/logrus"
-	"portfolio-cms-server/utils"
+	utils2 "portfolio-cms-server/utils"
 	"time"
 )
 
@@ -14,7 +14,7 @@ import (
 func CloseConnection() {
 	err := instance.DB.Close()
 	if err != nil {
-		utils.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Error on closing DB connection attempt")
+		utils2.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Error on closing DB connection attempt")
 	}
 }
 
@@ -35,7 +35,7 @@ func GetSingleRecordNamedQuery(destination interface{}, query string, args inter
 			return err
 		}
 		return namedStatement.Unsafe().GetContext(ctx, destination, args)
-	}, utils.RetryConfig())
+	}, utils2.RetryConfig())
 	return
 }
 
@@ -45,6 +45,6 @@ func GetMultipleRecords(destination interface{}, query string) (err error) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
 		return instance.DB.Unsafe().SelectContext(ctx, destination, query)
-	}, utils.RetryConfig())
+	}, utils2.RetryConfig())
 	return
 }
