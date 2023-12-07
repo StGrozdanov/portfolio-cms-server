@@ -58,9 +58,6 @@ jobs:
     name: Linters
     needs: [ install_app ]
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ inputs.working-directory || github.workspace }}/src
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -75,7 +72,10 @@ jobs:
           path: ${{ env.PATH_PREFIX }}/vendor
           key: ${{ format('{0}vendor-{1}', env.CACHE_PREFIX, hashFiles(format('{0}/go.sum', env.PATH_PREFIX))) }}
       - name: Run Linters
-        run: golangci-lint run
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          working-directory: src
 
   test_app:
     name: Tests
