@@ -16,6 +16,9 @@ jobs:
   install_app:
     name: Install
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory || github.workspace }}/src
     outputs:
       cache-path: ${{ steps.app-cache.outputs.path }}
       cache-key: ${{ steps.app-cache.outputs.key }}
@@ -45,7 +48,6 @@ jobs:
         id: install
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
-          cd src
           go mod tidy
           go mod vendor
       - name: Build app
