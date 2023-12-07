@@ -98,12 +98,12 @@ jobs:
           path: ${{ env.PATH_PREFIX }}/vendor
           key: ${{ format('{0}vendor-{1}', env.CACHE_PREFIX, hashFiles(format('{0}/go.sum', env.PATH_PREFIX))) }}
       - name: Run tests
-        run: go test -v ./... -json > TestResults-go-v1.21.json
+        run: go test -v ./... -json > test-results-${{ github.ref_name }}.json
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
-          name: Go-results-v1.21
-          path: TestResults-TestResults-go-v1.21.json
+          name: test-results-${{ github.ref_name }}.json
+          path: ${{ inputs.working-directory || github.workspace }}/test-results-${{ github.ref_name }}.json
 
   deploy:
     name: Deploy
