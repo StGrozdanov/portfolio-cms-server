@@ -5,7 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
-	utils2 "portfolio-cms-server/utils"
+	"portfolio-cms-server/utils"
 	"sync"
 	"time"
 )
@@ -28,7 +28,7 @@ func Init(hosts string, user string, password string, port string, database stri
 		syncOnce.Do(
 			func() {
 				instance = &db{
-					host:     utils2.GetRandomHost(hosts),
+					host:     utils.GetRandomHost(hosts),
 					user:     user,
 					password: password,
 					port:     port,
@@ -50,6 +50,6 @@ func connect() {
 		instance.DB.SetConnMaxIdleTime(30 * time.Second)
 		instance.DB.SetConnMaxLifetime(30 * time.Second)
 	} else {
-		utils2.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Error on connection attempt to the Database")
+		utils.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Error on connection attempt to the Database")
 	}
 }

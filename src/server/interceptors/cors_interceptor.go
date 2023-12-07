@@ -5,8 +5,8 @@ import (
 	"net/http"
 )
 
-// Interceptor handles the CORS headers and origins
-func Interceptor() gin.HandlerFunc {
+// CORSInterceptor handles the CORS headers and origins
+func CORSInterceptor() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		ctx.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
