@@ -50,7 +50,7 @@ func Init() (configurations, error) {
 }
 
 func loadFromOsEnv() (err error) {
-	err = parser.Load(env.Provider("GO_CMS", "_", transformOsEnvToStructKeys), nil)
+	err = parser.Load(env.Provider("GO_CMS_", "_", transformOsEnvToStructKeys), nil)
 	if err != nil {
 		return err
 	}
@@ -66,5 +66,5 @@ func mapOsEnvToConfigurations() {
 }
 
 func transformOsEnvToStructKeys(env string) string {
-	return strings.Replace(env, "GO_CMS", "", -1)
+	return strings.Replace(env, "GO_CMS_", "", -1)
 }
