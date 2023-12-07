@@ -37,7 +37,7 @@ jobs:
           echo "restore=${{ format('{0}vendor-', env.CACHE_PREFIX) }}" >> $GITHUB_OUTPUT
       - name: Cache dependencies
         id: cache-dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: ${{ steps.app-cache.outputs.path }}
           key: ${{ steps.app-cache.outputs.key }}
@@ -70,7 +70,7 @@ jobs:
           cache: "go"
           cache-dependency-path: ${{ env.PATH_PREFIX }}/go.sum
       - name: Load dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: ${{ env.PATH_PREFIX }}/vendor
           key: ${{ format('{0}vendor-{1}', env.CACHE_PREFIX, hashFiles(format('{0}/go.sum', env.PATH_PREFIX))) }}
@@ -94,7 +94,7 @@ jobs:
           cache: "go"
           cache-dependency-path: ${{ env.PATH_PREFIX }}/go.sum
       - name: Load dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: ${{ env.PATH_PREFIX }}/vendor
           key: ${{ format('{0}vendor-{1}', env.CACHE_PREFIX, hashFiles(format('{0}/go.sum', env.PATH_PREFIX))) }}
@@ -108,6 +108,7 @@ jobs:
 
   deploy:
     name: Deploy
+    needs: [ lint_app, test_app ]
     runs-on: ubuntu-latest
     defaults:
       run:
