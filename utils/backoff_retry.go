@@ -5,10 +5,12 @@ import (
 	"time"
 )
 
-func RetryConfig() *backoff.ExponentialBackOff {
-	var bo = backoff.NewExponentialBackOff()
-	bo.InitialInterval = 500 * time.Millisecond
-	bo.Multiplier = 1.5
-	bo.RandomizationFactor = 0.5
-	return bo
+// RetryConfig configuration for the retry mechanism such as retry interval, randomization factor, multiplier
+func RetryConfig() (exponentialBackOffInstance *backoff.ExponentialBackOff) {
+	exponentialBackOffInstance = backoff.NewExponentialBackOff()
+
+	exponentialBackOffInstance.InitialInterval = 500 * time.Millisecond
+	exponentialBackOffInstance.Multiplier = 1.5
+	exponentialBackOffInstance.RandomizationFactor = 0.5
+	return
 }

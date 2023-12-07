@@ -18,12 +18,14 @@ func CloseConnection() {
 	}
 }
 
+// Ping makes a simple ping with 3 second timeout
 func Ping() error {
 	var ctx, cancel = context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	return instance.DB.PingContext(ctx)
 }
 
+// GetSingleRecordNamedQuery selects a single record from a named query and parses it to a destination
 func GetSingleRecordNamedQuery(destination interface{}, query string, args interface{}) (err error) {
 	err = backoff.Retry(func() error {
 		var ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
@@ -37,6 +39,7 @@ func GetSingleRecordNamedQuery(destination interface{}, query string, args inter
 	return
 }
 
+// GetMultipleRecords selects multiple records from the database
 func GetMultipleRecords(destination interface{}, query string) (err error) {
 	err = backoff.Retry(func() error {
 		var ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)

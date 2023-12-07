@@ -17,6 +17,7 @@ func setupRouter() (router *gin.Engine) {
 	return
 }
 
+// Run defines the router endpoints and starts the server
 func Run() {
 	router := setupRouter()
 	router.GET("/healths", handlers.HealthCheck)

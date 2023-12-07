@@ -21,6 +21,7 @@ type db struct {
 
 var instance *db
 
+// Init initialises database connection
 func Init(hosts string, user string, password string, port string, database string) {
 	var syncOnce sync.Once
 	if instance == nil {

@@ -30,6 +30,7 @@ func init() {
 	})
 }
 
+// GetLogger gets the configurated logrus logger
 func GetLogger() *log.Entry {
 	return log.WithFields(map[string]interface{}{
 		"app_name": "portfolio-cms-server",

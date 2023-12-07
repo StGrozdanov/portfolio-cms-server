@@ -15,12 +15,13 @@ var (
 	skip       map[string]struct{}
 )
 
+// Logger logging middleware that tracks the request and response data and execution times. Accepts fields
+// that can be ignored.
 func Logger(logger logrus.FieldLogger, notLogged ...string) gin.HandlerFunc {
 	hostname, err := os.Hostname()
 	if err != nil {
 		hostname = "unknown"
 	}
-
 	populateSkippedFields(notLogged...)
 
 	return func(c *gin.Context) {

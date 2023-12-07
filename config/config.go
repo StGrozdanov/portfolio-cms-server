@@ -19,6 +19,7 @@ type configurations struct {
 	DBName     string `json:"db_name" koanf:"DB_NAME" valid:"required"`
 }
 
+// Init consumes the env file, validates it and parses it to a struct
 func Init() (configurations, error) {
 	var (
 		parser = koanf.New(".")

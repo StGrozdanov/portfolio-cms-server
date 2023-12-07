@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// Interceptor handles the CORS headers and origins
 func Interceptor() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Writer.Header().Set("Access-Control-Allow-Origin", "*")

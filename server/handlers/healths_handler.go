@@ -13,6 +13,8 @@ type healthResponse struct {
 
 var health healthResponse
 
+// HealthCheck checks the external systems connection and returns their status along with the application
+// overall status flag
 func HealthCheck(ginCtx *gin.Context) {
 	checkDB(&health)
 	ginCtx.JSON(http.StatusOK, health)
