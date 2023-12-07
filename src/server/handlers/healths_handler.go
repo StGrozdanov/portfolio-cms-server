@@ -29,5 +29,4 @@ func checkDB(response *healthResponse) {
 		response.AppStatus = "Healthy"
 		response.DatabaseStatus = "Healthy"
 	}
-	database.CloseConnection()
 }
