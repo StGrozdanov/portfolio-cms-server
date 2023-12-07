@@ -2,4 +2,3 @@
 *.idea
 *.DS_Store
 *tmp
-src/fly.toml
