@@ -4,7 +4,7 @@
 #
 
 app = "portfolio-cms-server"
-primary_region = "otp"
+primary_region = "ams"
 
 [build]
   builder = "paketobuildpacks/builder:base"
