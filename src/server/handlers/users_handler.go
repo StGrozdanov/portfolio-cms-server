@@ -4,12 +4,12 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"portfolio-cms-server/internal"
+	"portfolio-cms-server/internal/users"
 	"portfolio-cms-server/utils"
 )
 
 func GetBasicInfo(ginCtx *gin.Context) {
-	basicUserInfo, err := internal.GetBasicUserInfo()
+	basicUserInfo, err := users.GetBasicInfo()
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 			ginCtx.JSON(http.StatusOK, map[string]interface{}{})
@@ -28,7 +28,7 @@ func GetBasicInfo(ginCtx *gin.Context) {
 }
 
 func GetSkills(ginCtx *gin.Context) {
-	userSkills, err := internal.GetUserSkills()
+	userSkills, err := users.GetSkills()
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 			ginCtx.JSON(http.StatusOK, map[string]interface{}{})
@@ -47,7 +47,7 @@ func GetSkills(ginCtx *gin.Context) {
 }
 
 func GetJobsAndProjects(ginCtx *gin.Context) {
-	jobsAndProjects, err := internal.GetJobsAndProjects()
+	jobsAndProjects, err := users.GetJobsAndProjects()
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 			ginCtx.JSON(http.StatusOK, map[string]interface{}{})
@@ -66,7 +66,7 @@ func GetJobsAndProjects(ginCtx *gin.Context) {
 }
 
 func GetSocials(ginCtx *gin.Context) {
-	socials, err := internal.GetSocials()
+	socials, err := users.GetSocials()
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 			ginCtx.JSON(http.StatusOK, map[string]interface{}{})

@@ -1,11 +1,11 @@
-package internal
+package users
 
 import (
 	"portfolio-cms-server/database"
 )
 
-// GetBasicUserInfo gets the basic user info from the database and returns it
-func GetBasicUserInfo() (basicUserInfo BasicUserInfo, err error) {
+// GetBasicInfo gets the basic user info from the database and returns it
+func GetBasicInfo() (basicUserInfo BasicUserInfo, err error) {
 	err = database.GetSingleRecord(
 		&basicUserInfo,
 		`SELECT email, cv_link, about_me, partners, carousel FROM users;`,
@@ -17,9 +17,9 @@ func GetBasicUserInfo() (basicUserInfo BasicUserInfo, err error) {
 	return
 }
 
-// GetUserSkills gets the user skills info from the database (such as tech stack, soft skills and hobbies)
+// GetSkills gets the user skills info from the database (such as tech stack, soft skills and hobbies)
 // and returns it
-func GetUserSkills() (userSkills UserSkills, err error) {
+func GetSkills() (userSkills UserSkills, err error) {
 	err = database.GetSingleRecord(
 		&userSkills,
 		`SELECT technology_stack ::JSONB -> 'techStack' AS tech_stack,

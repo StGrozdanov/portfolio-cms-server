@@ -1,4 +1,4 @@
-package internal
+package users
 
 import "encoding/json"
 

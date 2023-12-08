@@ -17,7 +17,9 @@ func init() {
 	if app.AppEnv == "LOC" {
 		utils.PrettyPrint(app)
 	}
+
 	database.Init(app.DBHosts, app.DBUsername, app.DBPassword, app.DBPort, app.DBName)
+	utils.GetJWTKey(app.JWTSecret)
 }
 
 func main() {

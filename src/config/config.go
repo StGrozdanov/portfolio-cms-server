@@ -19,6 +19,8 @@ type configurations struct {
 	DBPassword string `json:"db_password" koanf:"DB_PASSWORD" valid:"required"`
 	DBPort     string `json:"db_port" koanf:"DB_PORT" valid:"required"`
 	DBName     string `json:"db_name" koanf:"DB_NAME" valid:"required"`
+
+	JWTSecret string `json:"jwt_secret" koanf:"JWT_SECRET" valid:"required"`
 }
 
 var (
