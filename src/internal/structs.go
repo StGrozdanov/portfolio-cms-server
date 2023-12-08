@@ -9,3 +9,9 @@ type BasicUserInfo struct {
 	Partners json.RawMessage `db:"partners" json:"partners"`
 	Carousel json.RawMessage `db:"carousel" json:"carousel"`
 }
+
+type UserSkills struct {
+	TechStack  json.RawMessage `db:"tech_stack" json:"techStack"`
+	SoftSkills json.RawMessage `db:"soft_skills" json:"softSkills"`
+	Hobbies    json.RawMessage `db:"hobbies" json:"hobbies"`
+}

@@ -12,7 +12,7 @@ func GetBasicInfo(ginCtx *gin.Context) {
 	basicUserInfo, err := internal.GetBasicUserInfo()
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			ginCtx.JSON(http.StatusOK, basicUserInfo)
+			ginCtx.JSON(http.StatusOK, map[string]interface{}{})
 			return
 		}
 
@@ -25,4 +25,23 @@ func GetBasicInfo(ginCtx *gin.Context) {
 		return
 	}
 	ginCtx.JSON(http.StatusOK, basicUserInfo)
+}
+
+func GetSkills(ginCtx *gin.Context) {
+	userSkills, err := internal.GetUserSkills()
+	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			ginCtx.JSON(http.StatusOK, map[string]interface{}{})
+			return
+		}
+
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on getting user skills info from the database")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusOK, userSkills)
 }
