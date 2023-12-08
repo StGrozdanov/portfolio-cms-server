@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"portfolio-cms-server/server/handlers"
-	"portfolio-cms-server/server/interceptors"
 	"portfolio-cms-server/server/middlewares"
 	"portfolio-cms-server/utils"
 )
@@ -14,7 +13,7 @@ func setupRouter() (router *gin.Engine) {
 	router = gin.New()
 
 	router.Use(middlewares.Logger(utils.GetLogger()), gin.Recovery())
-	router.Use(interceptors.CORSInterceptor())
+	router.Use(middlewares.CORS())
 
 	router.GET("/healths", handlers.HealthCheck)
 	router.GET("/metrics", handlers.Metrics)
@@ -23,6 +22,12 @@ func setupRouter() (router *gin.Engine) {
 	router.GET("/users/jobs-and-projects", handlers.GetJobsAndProjects)
 	router.GET("/users/socials", handlers.GetSocials)
 	router.POST("/auth/login", handlers.Login)
+
+	fileAuthGroup := router.Group("/files")
+	fileAuthGroup.Use(middlewares.AuthMiddleware())
+	{
+		fileAuthGroup.POST("/cv", handlers.UploadCV)
+	}
 	return
 }
 

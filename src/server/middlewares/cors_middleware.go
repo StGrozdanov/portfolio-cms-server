@@ -1,12 +1,12 @@
-package interceptors
+package middlewares
 
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-// CORSInterceptor handles the CORS headers and origins
-func CORSInterceptor() gin.HandlerFunc {
+// CORS handles the CORS headers and origins
+func CORS() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		ctx.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
