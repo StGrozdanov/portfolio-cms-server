@@ -15,3 +15,12 @@ type UserSkills struct {
 	SoftSkills json.RawMessage `db:"soft_skills" json:"softSkills"`
 	Hobbies    json.RawMessage `db:"hobbies" json:"hobbies"`
 }
+
+type JobsAndProjects struct {
+	Jobs     json.RawMessage `db:"jobs" json:"jobs"`
+	Projects json.RawMessage `db:"projects" json:"projects"`
+}
+
+type Socials struct {
+	SocialMedia json.RawMessage `db:"social_media" json:"socialMedia"`
+}

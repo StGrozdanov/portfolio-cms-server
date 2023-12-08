@@ -19,7 +19,9 @@ func setupRouter() (router *gin.Engine) {
 	router.GET("/healths", handlers.HealthCheck)
 	router.GET("/metrics", handlers.Metrics)
 	router.GET("/users/basic-info", handlers.GetBasicInfo)
-	router.GET("/users/user-skills", handlers.GetSkills)
+	router.GET("/users/skills", handlers.GetSkills)
+	router.GET("/users/jobs-and-projects", handlers.GetJobsAndProjects)
+	router.GET("/users/socials", handlers.GetSocials)
 	return
 }
 

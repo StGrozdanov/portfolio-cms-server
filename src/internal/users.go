@@ -33,3 +33,21 @@ func GetUserSkills() (userSkills UserSkills, err error) {
 	}
 	return
 }
+
+// GetJobsAndProjects gets the user jobs and projects info from the database
+func GetJobsAndProjects() (jobsAndProjects JobsAndProjects, err error) {
+	err = database.GetSingleRecord(&jobsAndProjects, `SELECT jobs, projects FROM users;`)
+	if err != nil {
+		return JobsAndProjects{}, err
+	}
+	return
+}
+
+// GetSocials gets the user jobs and projects info from the database
+func GetSocials() (socials Socials, err error) {
+	err = database.GetSingleRecord(&socials, `SELECT social_media FROM users;`)
+	if err != nil {
+		return Socials{}, err
+	}
+	return
+}

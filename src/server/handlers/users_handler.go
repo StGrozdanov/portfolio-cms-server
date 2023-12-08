@@ -45,3 +45,41 @@ func GetSkills(ginCtx *gin.Context) {
 	}
 	ginCtx.JSON(http.StatusOK, userSkills)
 }
+
+func GetJobsAndProjects(ginCtx *gin.Context) {
+	jobsAndProjects, err := internal.GetJobsAndProjects()
+	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			ginCtx.JSON(http.StatusOK, map[string]interface{}{})
+			return
+		}
+
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on getting jobs and projects from the database")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusOK, jobsAndProjects)
+}
+
+func GetSocials(ginCtx *gin.Context) {
+	socials, err := internal.GetSocials()
+	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			ginCtx.JSON(http.StatusOK, map[string]interface{}{})
+			return
+		}
+
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on getting socials from the database")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusOK, socials)
+}
