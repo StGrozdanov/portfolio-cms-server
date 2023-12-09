@@ -18,7 +18,24 @@ func init() {
 		utils.PrettyPrint(app)
 	}
 
-	database.Init(app.DBHosts, app.DBUsername, app.DBPassword, app.DBPort, app.DBName)
+	database.Init(
+		app.DBHosts,
+		app.DBUsername,
+		app.DBPassword,
+		app.DBPort,
+		app.DBName,
+	)
+
+	utils.CreateS3Session(
+		app.S3BucketName,
+		app.S3BucketKey,
+		app.S3BucketURL,
+		app.S3BucketRegion,
+		app.AWSAccessKey,
+		app.AWSSecretKey,
+		app.S3ACL,
+	)
+
 	utils.GetJWTKey(app.JWTSecret)
 }
 

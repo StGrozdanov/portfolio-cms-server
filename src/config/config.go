@@ -14,13 +14,21 @@ import (
 type configurations struct {
 	AppEnv string `json:"app_env" koanf:"APP_ENV" valid:"required"`
 
+	JWTSecret string `json:"jwt_secret" koanf:"JWT_SECRET" valid:"required"`
+
 	DBHosts    string `json:"db_hosts" koanf:"DB_HOSTS" valid:"required"`
 	DBUsername string `json:"db_username" koanf:"DB_USERNAME" valid:"required"`
 	DBPassword string `json:"db_password" koanf:"DB_PASSWORD" valid:"required"`
 	DBPort     string `json:"db_port" koanf:"DB_PORT" valid:"required"`
 	DBName     string `json:"db_name" koanf:"DB_NAME" valid:"required"`
 
-	JWTSecret string `json:"jwt_secret" koanf:"JWT_SECRET" valid:"required"`
+	S3BucketName   string `json:"s3_bucket_name" koanf:"S3_BUCKET_NAME"`
+	S3BucketKey    string `json:"s3_bucket_key" koanf:"S3_BUCKET_KEY"`
+	S3BucketRegion string `json:"s3_bucket_region" koanf:"S3_BUCKET_REGION"`
+	S3ACL          string `json:"s3_ACL" koanf:"S3_ACL"`
+	S3BucketURL    string `json:"s3_bucket_url" koanf:"S3_BUCKET_URL"`
+	AWSAccessKey   string `json:"aws_access_key" koanf:"AWS_ACCESS_KEY_ID"`
+	AWSSecretKey   string `json:"aws_secret_key" koanf:"AWS_SECRET_ACCESS_KEY"`
 }
 
 var (
