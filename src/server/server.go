@@ -28,6 +28,13 @@ func setupRouter() (router *gin.Engine) {
 	{
 		fileAuthGroup.POST("/cv", handlers.UploadCV)
 	}
+
+	analyticsAuthGroup := router.Group("/analytics")
+	analyticsAuthGroup.Use(middlewares.AuthMiddleware())
+	{
+		analyticsAuthGroup.GET("", handlers.GetAnalytics)
+		analyticsAuthGroup.GET("/count", handlers.CountAnalytics)
+	}
 	return
 }
 
