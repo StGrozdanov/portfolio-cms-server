@@ -27,6 +27,12 @@ func setupRouter() (router *gin.Engine) {
 	fileAuthGroup.Use(middlewares.AuthMiddleware())
 	{
 		fileAuthGroup.POST("/cv", handlers.UploadCV)
+
+		imageGroup := fileAuthGroup.Group("")
+		imageGroup.Use(middlewares.ImageContentTypeMiddleware())
+		{
+			imageGroup.POST("/project-image", handlers.UploadProjectImage)
+		}
 	}
 
 	analyticsAuthGroup := router.Group("/analytics")

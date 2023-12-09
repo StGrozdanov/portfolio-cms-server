@@ -38,3 +38,28 @@ func UploadCV(ginCtx *gin.Context) {
 	}
 	ginCtx.JSON(http.StatusCreated, map[string]interface{}{"cvLink": cvLink})
 }
+
+func UploadProjectImage(ginCtx *gin.Context) {
+	image, _ := ginCtx.FormFile("image")
+
+	projectTitle, found := ginCtx.GetPostForm("projectTitle")
+	if !found {
+		ginCtx.JSON(
+			http.StatusBadRequest,
+			map[string]interface{}{"error": "invalid parameters, expected projectTitle"},
+		)
+		return
+	}
+
+	projectImages, err := files.UploadProjectImage(image, projectTitle)
+	if err != nil {
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on attempting to upload a project image")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusCreated, map[string]interface{}{"project_images": projectImages})
+}

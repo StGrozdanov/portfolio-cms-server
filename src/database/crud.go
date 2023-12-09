@@ -15,10 +15,10 @@ func Ping() error {
 }
 
 // ExecuteQuery executes queries such as INSERT, UPDATE or DELETE
-func ExecuteQuery(query string, args ...any) (sql.Result, error) {
+func ExecuteQuery(query string) (sql.Result, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	return instance.DB.Unsafe().ExecContext(ctx, query, args)
+	return instance.DB.Unsafe().ExecContext(ctx, query)
 }
 
 // ExecuteNamedQuery executes queries such as INSERT, UPDATE or DELETE with named parameters
