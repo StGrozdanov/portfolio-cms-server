@@ -28,8 +28,7 @@ func ExecuteNamedQuery(query string, arg interface{}) (sql.Result, error) {
 	return instance.DB.Unsafe().NamedExecContext(ctx, query, arg)
 }
 
-// GetSingleRecordNamedQuery selects a single record from a named query, using struct fields as parameters
-// and parses it to a destination
+// GetSingleRecordNamedQuery selects a single record from a named query and parses it to the destination
 func GetSingleRecordNamedQuery(destination interface{}, query string, args interface{}) (err error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()

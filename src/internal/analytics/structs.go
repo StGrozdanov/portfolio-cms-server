@@ -8,12 +8,8 @@ type Analytics struct {
 }
 
 type Analytic struct {
-	Date          string `db:"date" json:"date"`
+	Date          string `db:"date_time" json:"date"`
 	DeviceType    string `db:"device_type" json:"deviceType"`
 	OriginCountry string `db:"origin_country" json:"originCountry"`
 	IpAddress     string `db:"ip_address" json:"ipAddress"`
-}
-
-type AnalyticsDateInput struct {
-	Date string `db:"date" json:"date"`
 }
