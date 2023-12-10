@@ -110,3 +110,29 @@ func UpdateBasicInfo(ginCtx *gin.Context) {
 	}
 	ginCtx.JSON(http.StatusOK, updatedInfo)
 }
+
+func UpdateSkills(ginCtx *gin.Context) {
+	requestBody := users.UserSkills{}
+
+	if err := ginCtx.ShouldBind(&requestBody); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, map[string]interface{}{"error": "invalid parameters"})
+		return
+	}
+
+	if _, err := validator.ValidateStruct(requestBody); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, map[string]interface{}{"error": "invalid parameters"})
+		return
+	}
+
+	updatedSkills, err := users.UpdateSkills(requestBody)
+	if err != nil {
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on attempting to update skills")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusOK, updatedSkills)
+}

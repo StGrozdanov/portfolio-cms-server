@@ -20,6 +20,7 @@ func setupRouter() (router *gin.Engine) {
 	router.GET("/users/basic-info", handlers.GetBasicInfo)
 	router.PUT("/users/basic-info", middlewares.AuthMiddleware(), handlers.UpdateBasicInfo)
 	router.GET("/users/skills", handlers.GetSkills)
+	router.PUT("/users/skills", middlewares.AuthMiddleware(), handlers.UpdateSkills)
 	router.GET("/users/jobs-and-projects", handlers.GetJobsAndProjects)
 	router.GET("/users/socials", handlers.GetSocials)
 	router.POST("/auth/login", handlers.Login)

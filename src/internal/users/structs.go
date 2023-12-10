@@ -11,16 +11,16 @@ type BasicUserInfo struct {
 }
 
 type UserSkills struct {
-	TechStack  json.RawMessage `db:"tech_stack" json:"techStack"`
-	SoftSkills json.RawMessage `db:"soft_skills" json:"softSkills"`
-	Hobbies    json.RawMessage `db:"hobbies" json:"hobbies"`
+	TechStack  json.RawMessage `db:"tech_stack" json:"techStack" valid:"required"`
+	SoftSkills json.RawMessage `db:"soft_skills" json:"softSkills" valid:"required"`
+	Hobbies    json.RawMessage `db:"hobbies" json:"hobbies" valid:"required"`
 }
 
 type JobsAndProjects struct {
-	Jobs     json.RawMessage `db:"jobs" json:"jobs"`
-	Projects json.RawMessage `db:"projects" json:"projects"`
+	Jobs     json.RawMessage `db:"jobs" json:"jobs" valid:"required"`
+	Projects json.RawMessage `db:"projects" json:"projects" valid:"required"`
 }
 
 type Socials struct {
-	SocialMedia json.RawMessage `db:"social_media" json:"socialMedia"`
+	SocialMedia json.RawMessage `db:"social_media" json:"socialMedia" valid:"required"`
 }

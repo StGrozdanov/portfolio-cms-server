@@ -68,7 +68,26 @@ func UpdateInfo(request BasicUserInfo) (basicUserInfo BasicUserInfo, err error) 
 	)
 
 	if err != nil {
-		return BasicUserInfo{}, err
+		return
+	}
+	return
+}
+
+// UpdateSkills updates the user skills in the database and returns it
+func UpdateSkills(request UserSkills) (skills UserSkills, err error) {
+	err = database.GetSingleRecordNamedQuery(
+		&skills,
+		`UPDATE users
+				SET technology_stack = JSONB_SET(technology_stack, '{techStack}', :tech_stack),
+					soft_skills      = JSONB_SET(soft_skills, '{softSkills}', :soft_skills),
+					hobbies          = JSONB_SET(hobbies, '{hobbies}', :hobbies)
+				WHERE users.id = 1
+				RETURNING*;`,
+		request,
+	)
+
+	if err != nil {
+		return
 	}
 	return
 }
