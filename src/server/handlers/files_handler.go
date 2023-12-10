@@ -88,3 +88,19 @@ func UploadJobImage(ginCtx *gin.Context) {
 	}
 	ginCtx.JSON(http.StatusCreated, map[string]interface{}{"job_images": jobImages})
 }
+
+func UploadPartnerImage(ginCtx *gin.Context) {
+	image, _ := ginCtx.FormFile("image")
+
+	partnerImages, err := files.UploadPartnerImage(image)
+	if err != nil {
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on attempting to upload a partner image")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusCreated, map[string]interface{}{"partners": partnerImages})
+}

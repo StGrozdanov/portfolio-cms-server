@@ -182,3 +182,35 @@ func executeUploadJobImageQuery(imageURL, company string) error {
 	)
 	return err
 }
+
+// UploadPartnerImage takes a form data file, processes it and transforms it to a bytes reader, generates a key
+// and uploads the image to the s3 bucket. When the file is uploaded - inserts the image into the database and
+// returns an array of existing images for all partners. (along with the newly created)
+func UploadPartnerImage(file *multipart.FileHeader) (partnerImages json.RawMessage, err error) {
+	randomId, _ := uuid.NewRandom()
+
+	fileKey := fmt.Sprintf("partner-%s", randomId.String())
+	contentType := file.Header.Get("Content-Type")
+
+	fileContent, _ := file.Open()
+	buffer := make([]byte, file.Size)
+	_, _ = fileContent.Read(buffer)
+	fileBytes := bytes.NewReader(buffer)
+
+	err = utils.UploadToS3(fileBytes, fileKey, contentType)
+	if err != nil {
+		return
+	}
+
+	imageURL := utils.GetTheFullS3BucketURL() + "/" + fileKey
+
+	JSONFriendlyImageURL := "\"" + imageURL + "\""
+
+	err = database.GetSingleRecordNamedQuery(
+		&partnerImages,
+		`UPDATE users SET partners = partners || :img_url RETURNING partners;`,
+		map[string]interface{}{"img_url": JSONFriendlyImageURL},
+	)
+
+	return
+}
