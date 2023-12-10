@@ -63,3 +63,28 @@ func UploadProjectImage(ginCtx *gin.Context) {
 	}
 	ginCtx.JSON(http.StatusCreated, map[string]interface{}{"project_images": projectImages})
 }
+
+func UploadJobImage(ginCtx *gin.Context) {
+	image, _ := ginCtx.FormFile("image")
+
+	company, found := ginCtx.GetPostForm("companyName")
+	if !found {
+		ginCtx.JSON(
+			http.StatusBadRequest,
+			map[string]interface{}{"error": "invalid parameters, expected companyName"},
+		)
+		return
+	}
+
+	jobImages, err := files.UploadJobImage(image, company)
+	if err != nil {
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on attempting to upload a job image")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusCreated, map[string]interface{}{"job_images": jobImages})
+}

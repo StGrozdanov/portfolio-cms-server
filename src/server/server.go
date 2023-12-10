@@ -32,6 +32,7 @@ func setupRouter() (router *gin.Engine) {
 		imageGroup.Use(middlewares.ImageContentTypeMiddleware())
 		{
 			imageGroup.POST("/project-image", handlers.UploadProjectImage)
+			imageGroup.POST("/job-image", handlers.UploadJobImage)
 		}
 	}
 
