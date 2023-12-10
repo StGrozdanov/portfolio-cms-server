@@ -51,3 +51,24 @@ func GetSocials() (socials Socials, err error) {
 	}
 	return
 }
+
+// UpdateInfo updates the basic user info in the database and returns it
+func UpdateInfo(request BasicUserInfo) (basicUserInfo BasicUserInfo, err error) {
+	err = database.GetSingleRecordNamedQuery(
+		&basicUserInfo,
+		`UPDATE users
+				SET about_me = :about_me,
+					cv_link  = :cv_link,
+					email    = :email,
+					partners = :partners,
+					carousel = :carousel
+				WHERE users.id = 1
+				RETURNING*;`,
+		request,
+	)
+
+	if err != nil {
+		return BasicUserInfo{}, err
+	}
+	return
+}

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	validator "github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -82,4 +83,30 @@ func GetSocials(ginCtx *gin.Context) {
 		return
 	}
 	ginCtx.JSON(http.StatusOK, socials)
+}
+
+func UpdateBasicInfo(ginCtx *gin.Context) {
+	request := users.BasicUserInfo{}
+
+	if err := ginCtx.ShouldBind(&request); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, map[string]interface{}{"error": "invalid parameters"})
+		return
+	}
+
+	if _, err := validator.ValidateStruct(request); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, map[string]interface{}{"error": "invalid parameters"})
+		return
+	}
+
+	updatedInfo, err := users.UpdateInfo(request)
+	if err != nil {
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on attempting to update base user info")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusOK, updatedInfo)
 }
