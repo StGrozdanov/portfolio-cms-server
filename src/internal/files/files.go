@@ -214,3 +214,45 @@ func UploadPartnerImage(file *multipart.FileHeader) (partnerImages json.RawMessa
 
 	return
 }
+
+// UploadCarouselImage takes a form data file, processes it and transforms it to a bytes reader, generates a key
+// and uploads the image to the s3 bucket. When the file is uploaded - inserts the image into the database and
+// returns an array of existing images for all carousels. (along with the newly created)
+func UploadCarouselImage(file *multipart.FileHeader) (carouselImages []json.RawMessage, err error) {
+	randomId, _ := uuid.NewRandom()
+
+	fileKey := fmt.Sprintf("carousel-%s", randomId.String())
+	contentType := file.Header.Get("Content-Type")
+
+	fileContent, _ := file.Open()
+	buffer := make([]byte, file.Size)
+	_, _ = fileContent.Read(buffer)
+	fileBytes := bytes.NewReader(buffer)
+
+	err = utils.UploadToS3(fileBytes, fileKey, contentType)
+	if err != nil {
+		return
+	}
+
+	imageURL := utils.GetTheFullS3BucketURL() + "/" + fileKey
+
+	JSONFriendlyImageURL := "\"" + imageURL + "\""
+
+	_, err = database.ExecuteNamedQuery(
+		`UPDATE users SET carousel = carousel || JSONB_BUILD_OBJECT('imgURL', CAST(:img_url AS JSONB));`,
+		map[string]interface{}{"img_url": JSONFriendlyImageURL},
+	)
+	if err != nil {
+		return
+	}
+
+	err = database.GetMultipleRecords(
+		&carouselImages,
+		`SELECT arr.object::JSONB -> 'imgURL' AS carousel_images
+				FROM users,
+					 JSONB_ARRAY_ELEMENTS(carousel) WITH ORDINALITY arr(object)
+				WHERE id = 1;`,
+	)
+
+	return
+}

@@ -104,3 +104,19 @@ func UploadPartnerImage(ginCtx *gin.Context) {
 	}
 	ginCtx.JSON(http.StatusCreated, map[string]interface{}{"partners": partnerImages})
 }
+
+func UploadCarouselImage(ginCtx *gin.Context) {
+	image, _ := ginCtx.FormFile("image")
+
+	carouselImages, err := files.UploadCarouselImage(image)
+	if err != nil {
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on attempting to upload carousel image")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusCreated, map[string]interface{}{"carousel_images": carouselImages})
+}

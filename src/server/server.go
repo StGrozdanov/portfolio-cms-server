@@ -34,6 +34,7 @@ func setupRouter() (router *gin.Engine) {
 			imageGroup.POST("/project-image", handlers.UploadProjectImage)
 			imageGroup.POST("/job-image", handlers.UploadJobImage)
 			imageGroup.POST("/partners", handlers.UploadPartnerImage)
+			imageGroup.POST("/carousel", handlers.UploadCarouselImage)
 		}
 	}
 
