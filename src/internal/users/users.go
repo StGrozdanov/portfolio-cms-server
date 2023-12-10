@@ -121,3 +121,21 @@ func UpdateSocials(request SocialsRequestBody) (socials Socials, err error) {
 	}
 	return
 }
+
+// UpdateJobsAndProjects updates the user jobs and projects info in the database and returns them
+func UpdateJobsAndProjects(request JobsAndProjects) (jobsAndProjects JobsAndProjects, err error) {
+	err = database.GetSingleRecordNamedQuery(
+		&jobsAndProjects,
+		`UPDATE users
+				SET jobs     = :jobs,
+					projects = :projects
+				WHERE users.id = 1
+				RETURNING *`,
+		request,
+	)
+
+	if err != nil {
+		return
+	}
+	return
+}
