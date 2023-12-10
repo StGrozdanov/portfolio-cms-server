@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	validator "github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -119,4 +120,30 @@ func UploadCarouselImage(ginCtx *gin.Context) {
 		return
 	}
 	ginCtx.JSON(http.StatusCreated, map[string]interface{}{"carousel_images": carouselImages})
+}
+
+func DeleteImage(ginCtx *gin.Context) {
+	requestBody := files.ImageDeleteRequestBody{}
+
+	if err := ginCtx.ShouldBind(&requestBody); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, map[string]interface{}{"error": "invalid parameters"})
+		return
+	}
+
+	if _, err := validator.ValidateStruct(requestBody); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, map[string]interface{}{"error": "invalid parameters"})
+		return
+	}
+
+	err := files.DeleteImage(requestBody.ImageURL)
+	if err != nil {
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Errorf("Error on attempting to delete image - %s", requestBody.ImageURL)
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusOK, map[string]interface{}{})
 }

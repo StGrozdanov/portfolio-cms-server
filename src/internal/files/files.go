@@ -256,3 +256,12 @@ func UploadCarouselImage(file *multipart.FileHeader) (carouselImages []json.RawM
 
 	return
 }
+
+// DeleteImage deletes an image from the s3 bucket
+func DeleteImage(imageURL string) (err error) {
+	err = utils.DeleteFromS3(imageURL)
+	if err != nil {
+		return
+	}
+	return
+}

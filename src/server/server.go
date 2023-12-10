@@ -28,6 +28,7 @@ func setupRouter() (router *gin.Engine) {
 	fileAuthGroup.Use(middlewares.AuthMiddleware())
 	{
 		fileAuthGroup.POST("/cv", handlers.UploadCV)
+		fileAuthGroup.DELETE("/image", handlers.DeleteImage)
 
 		imageGroup := fileAuthGroup.Group("")
 		imageGroup.Use(middlewares.ImageContentTypeMiddleware())
