@@ -24,3 +24,10 @@ type JobsAndProjects struct {
 type Socials struct {
 	SocialMedia json.RawMessage `db:"social_media" json:"socialMedia" valid:"required"`
 }
+
+type SocialsRequestBody struct {
+	Facebook string `db:"facebook" json:"facebook" valid:"required"`
+	LinkedIn string `db:"linkedIn" json:"linkedIn" valid:"required"`
+	Github   string `db:"github" json:"github" valid:"required"`
+	Email    string `db:"email" json:"email" valid:"required"`
+}

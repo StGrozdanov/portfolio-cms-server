@@ -91,3 +91,33 @@ func UpdateSkills(request UserSkills) (skills UserSkills, err error) {
 	}
 	return
 }
+
+// UpdateSocials updates the user social media links in the database and returns them
+func UpdateSocials(request SocialsRequestBody) (socials Socials, err error) {
+	err = database.GetSingleRecordNamedQuery(
+		&socials,
+		`UPDATE users
+				SET social_media = JSONB_OBJECT(
+						array [
+							'facebook',
+							'linkedIn',
+							'github',
+							'email'
+							],
+						array [
+							:facebook,
+							:linkedIn,
+							:github,
+							:email
+							]
+								   )
+				WHERE users.id = 1
+				RETURNING*;`,
+		request,
+	)
+
+	if err != nil {
+		return
+	}
+	return
+}

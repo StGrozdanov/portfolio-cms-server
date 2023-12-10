@@ -136,3 +136,29 @@ func UpdateSkills(ginCtx *gin.Context) {
 	}
 	ginCtx.JSON(http.StatusOK, updatedSkills)
 }
+
+func UpdateSocials(ginCtx *gin.Context) {
+	requestBody := users.SocialsRequestBody{}
+
+	if err := ginCtx.ShouldBind(&requestBody); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, map[string]interface{}{"error": "invalid parameters"})
+		return
+	}
+
+	if _, err := validator.ValidateStruct(requestBody); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, map[string]interface{}{"error": "invalid parameters"})
+		return
+	}
+
+	updatedSocials, err := users.UpdateSocials(requestBody)
+	if err != nil {
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on attempting to update socials")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusOK, updatedSocials)
+}

@@ -23,6 +23,7 @@ func setupRouter() (router *gin.Engine) {
 	router.PUT("/users/skills", middlewares.AuthMiddleware(), handlers.UpdateSkills)
 	router.GET("/users/jobs-and-projects", handlers.GetJobsAndProjects)
 	router.GET("/users/socials", handlers.GetSocials)
+	router.PUT("/users/socials", handlers.UpdateSocials)
 	router.POST("/auth/login", handlers.Login)
 
 	fileAuthGroup := router.Group("/files")
