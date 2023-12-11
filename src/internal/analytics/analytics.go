@@ -28,7 +28,8 @@ var allowedQuarterFormats = map[int]interface{}{
 // Get gets analytics depending on the provided query parameters
 func Get(parameter gin.Param) (Analytics, error) {
 	if mapFunction, parameterIsFound := analyticTypes[parameter.Key]; parameterIsFound {
-		return mapFunction()
+		results, err := mapFunction()
+		return normaliseOutput(results, err)
 	} else if parameter.Key == "quarter" {
 		quarterFormatError := errors.New("the provided quarter param should be in format quarter=number where number is from 1 to 4")
 
@@ -42,8 +43,9 @@ func Get(parameter gin.Param) (Analytics, error) {
 			err = quarterFormatError
 			return Analytics{}, err
 		}
-
-		return getAnalyticsForTheQuarter(paramAsANumber)
+		
+		results, err := getAnalyticsForTheQuarter(paramAsANumber)
+		return normaliseOutput(results, err)
 	}
 	return Analytics{}, errors.New("no param was found matching your criteria")
 }
@@ -224,4 +226,16 @@ func getAnalyticsBetweenTheDatesQuery(startDate, endDate string) (analyticsResul
 	)
 	analyticsResults.TotalVisitationsCount = len(analyticsResults.Results)
 	return
+}
+
+func normaliseOutput(analytics Analytics, err error) (Analytics, error) {
+	if err != nil {
+		return analytics, err
+	}
+
+	if analytics.Results == nil {
+		analytics.Results = []Analytic{}
+	}
+
+	return analytics, err
 }
