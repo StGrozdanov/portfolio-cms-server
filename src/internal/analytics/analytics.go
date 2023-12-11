@@ -43,7 +43,7 @@ func Get(parameter gin.Param) (Analytics, error) {
 			err = quarterFormatError
 			return Analytics{}, err
 		}
-		
+
 		results, err := getAnalyticsForTheQuarter(paramAsANumber)
 		return normaliseOutput(results, err)
 	}
@@ -61,7 +61,7 @@ func Count() (count int, err error) {
 
 	err = database.GetSingleRecordNamedQuery(
 		&count,
-		`SELECT COALESCE(COUNT(id), 0) FROM analytics WHERE date_time = :date;`,
+		`SELECT COALESCE(COUNT(id), 0) FROM analytics WHERE DATE(date_time) = :date;`,
 		map[string]interface{}{"date": date},
 	)
 	return
@@ -153,7 +153,7 @@ func getAnalyticsForTheDateQuery(date string) (analyticsResults Analytics, err e
 					   origin_country,
 					   ip_address
 				FROM analytics
-					WHERE date_time = :date;`,
+					WHERE DATE(date_time) = :date;`,
 		map[string]interface{}{"date": date},
 	)
 
@@ -161,7 +161,7 @@ func getAnalyticsForTheDateQuery(date string) (analyticsResults Analytics, err e
 		&analyticsResults.MostPopularCountry,
 		`SELECT origin_country AS most_popular_country
             	FROM analytics
-                	WHERE date_time = :date
+                	WHERE DATE(date_time) = :date
                 GROUP BY origin_country
                 ORDER BY COUNT(origin_country) DESC
                 LIMIT 1`,
@@ -172,7 +172,7 @@ func getAnalyticsForTheDateQuery(date string) (analyticsResults Analytics, err e
 		&analyticsResults.MostPopularDevice,
 		`SELECT device_type AS most_popular_device
                 FROM analytics
-                	WHERE date_time = :date
+                	WHERE DATE(date_time) = :date
                 GROUP BY device_type
                 ORDER BY COUNT(device_type) DESC
                 LIMIT 1`,
@@ -190,7 +190,7 @@ func getAnalyticsBetweenTheDatesQuery(startDate, endDate string) (analyticsResul
 					   origin_country,
 					   ip_address
 				FROM analytics
-					WHERE date_time BETWEEN :startDate AND :endDate;`,
+					WHERE DATE(date_time) BETWEEN :startDate AND :endDate;`,
 		map[string]interface{}{
 			"startDate": startDate,
 			"endDate":   endDate,
@@ -201,7 +201,7 @@ func getAnalyticsBetweenTheDatesQuery(startDate, endDate string) (analyticsResul
 		&analyticsResults.MostPopularCountry,
 		`SELECT origin_country
 				FROM analytics
-					WHERE date_time BETWEEN :startDate AND :endDate
+					WHERE DATE(date_time) BETWEEN :startDate AND :endDate
 				GROUP BY origin_country
 				ORDER BY COUNT(origin_country) DESC
 				LIMIT 1`,
