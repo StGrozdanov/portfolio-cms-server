@@ -65,14 +65,20 @@ func UploadProjectImage(file *multipart.FileHeader, projectTitle string) (projec
 
 	imageURL := utils.GetTheFullS3BucketURL() + "/" + fileKey
 
-	err = executeUploadProjectImageQuery(imageURL, projectTitle)
+	fileBytes2 := bytes.NewReader(buffer)
+	img, _, err := image.DecodeConfig(fileBytes2)
+	if err != nil {
+		return
+	}
+
+	err = executeUploadProjectImageQuery(imageURL, projectTitle, img.Width, img.Height)
 	if err != nil {
 		return
 	}
 
 	err = database.GetSingleRecordNamedQuery(
 		&projectImages,
-		`SELECT CAST(arr.object AS JSONB) -> 'imgUrl' AS project_images
+		`SELECT CAST(arr.object AS JSONB) -> 'images' AS project_images
 				FROM users,
 					 JSONB_ARRAY_ELEMENTS(projects) WITH ORDINALITY arr(object)
 				WHERE CAST(arr.object AS JSONB) ->> 'title' = :project_name;`,
@@ -82,7 +88,7 @@ func UploadProjectImage(file *multipart.FileHeader, projectTitle string) (projec
 	return
 }
 
-func executeUploadProjectImageQuery(imageURL, projectTitle string) error {
+func executeUploadProjectImageQuery(imageURL, projectTitle string, width, height int) error {
 	formattedImage := strings.ReplaceAll(imageURL, " ", "+")
 	_, err := database.ExecuteNamedQuery(
 		`WITH result_objects AS (SELECT arr.object AS object_result
@@ -98,18 +104,17 @@ func executeUploadProjectImageQuery(imageURL, projectTitle string) error {
 								 FROM users,
 									  JSONB_ARRAY_ELEMENTS(projects) WITH ORDINALITY arr(object)
 								 WHERE CAST(arr.object AS JSONB) ->> 'title' = :project_title),
-								'{imgUrl}',
-								JSONB_BUILD_ARRAY(
-										(SELECT REPLACE(REPLACE(REPLACE(CAST(arr.object AS JSONB) ->> 'imgUrl', '[', ''), ']', ''), '"',
-														'')
-										 FROM users,
-											  JSONB_ARRAY_ELEMENTS(projects) WITH ORDINALITY arr(object)
-										 WHERE CAST(arr.object AS JSONB) ->> 'title' = :project_title),
-										CAST(:img_url AS text)
-								)
-						)
-					)`,
-		map[string]interface{}{"project_title": projectTitle, "img_url": formattedImage},
+								'{images}',
+								(SELECT JSONB_AGG(image)
+								 FROM (SELECT jsonb_array_elements(CAST(arr.object AS JSONB) -> 'images') AS image
+									   FROM users,
+											JSONB_ARRAY_ELEMENTS(projects) WITH ORDINALITY arr(object)
+									   WHERE CAST(arr.object AS JSONB) ->> 'title' = :project_title
+									   UNION
+		                         SELECT JSONB_BUILD_OBJECT('imgURL', CAST(:img_url AS TEXT), 'width', CAST(:width AS INT), 'height', CAST(:height AS INT)) AS image) AS subquery)
+							)
+					);`,
+		map[string]interface{}{"project_title": projectTitle, "img_url": formattedImage, "width": width, "height": height},
 	)
 	return err
 }
@@ -135,7 +140,13 @@ func UploadJobImage(file *multipart.FileHeader, company string) (jobImages json.
 
 	imageURL := utils.GetTheFullS3BucketURL() + "/" + fileKey
 
-	err = executeUploadJobImageQuery(imageURL, company)
+	fileBytes2 := bytes.NewReader(buffer)
+	img, _, err := image.DecodeConfig(fileBytes2)
+	if err != nil {
+		return
+	}
+
+	err = executeUploadJobImageQuery(imageURL, company, img.Width, img.Height)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -143,7 +154,7 @@ func UploadJobImage(file *multipart.FileHeader, company string) (jobImages json.
 
 	err = database.GetSingleRecordNamedQuery(
 		&jobImages,
-		`SELECT CAST(arr.object AS JSONB) -> 'imgUrl' AS job_images
+		`SELECT CAST(arr.object AS JSONB) -> 'images' AS job_images
 				FROM users,
 					 JSONB_ARRAY_ELEMENTS(jobs) WITH ORDINALITY arr(object)
 				WHERE CAST(arr.object AS JSONB)  ->> 'company' = :company_name;`,
@@ -153,7 +164,7 @@ func UploadJobImage(file *multipart.FileHeader, company string) (jobImages json.
 	return
 }
 
-func executeUploadJobImageQuery(imageURL, company string) error {
+func executeUploadJobImageQuery(imageURL, company string, width, height int) error {
 	formattedImage := strings.ReplaceAll(imageURL, " ", "+")
 
 	_, err := database.ExecuteNamedQuery(
@@ -170,18 +181,17 @@ func executeUploadJobImageQuery(imageURL, company string) error {
 								 FROM users,
 									  JSONB_ARRAY_ELEMENTS(jobs) WITH ORDINALITY arr(object)
 								 WHERE CAST(arr.object AS JSONB) ->> 'company' = :company_name),
-								'{imgUrl}',
-								JSONB_BUILD_ARRAY(
-										(SELECT REPLACE(REPLACE(REPLACE(CAST(arr.object AS JSONB) ->> 'imgUrl', '[', ''), ']', ''),
-														'"',
-														'')
-										 FROM users,
-											  JSONB_ARRAY_ELEMENTS(jobs) WITH ORDINALITY arr(object)
-										 WHERE CAST(arr.object AS JSONB) ->> 'company' = :company_name),
-										CAST(:img_url AS TEXT))
-						)
+								'{images}',
+								(SELECT JSONB_AGG(image)
+								 FROM (SELECT jsonb_array_elements(CAST(arr.object AS JSONB) -> 'images') AS image
+									   FROM users,
+											JSONB_ARRAY_ELEMENTS(jobs) WITH ORDINALITY arr(object)
+									   WHERE CAST(arr.object AS JSONB) ->> 'title' = :company_name
+									   UNION
+									   SELECT JSONB_BUILD_OBJECT('imgURL', CAST(:img_url AS TEXT), 'width', CAST(:width AS INT), 'height', CAST(:height AS INT)) AS image) AS subquery)
+							)
 					);`,
-		map[string]interface{}{"company_name": company, "img_url": formattedImage},
+		map[string]interface{}{"company_name": company, "img_url": formattedImage, "width": width, "height": height},
 	)
 	return err
 }
