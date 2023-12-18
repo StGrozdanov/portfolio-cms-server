@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"github.com/goccy/go-json"
 	"github.com/google/uuid"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"mime/multipart"
 	"portfolio-cms-server/database"
 	"portfolio-cms-server/utils"
@@ -202,14 +205,24 @@ func UploadPartnerImage(file *multipart.FileHeader) (partnerImages json.RawMessa
 		return
 	}
 
-	imageURL := utils.GetTheFullS3BucketURL() + "/" + fileKey
+	fileBytes2 := bytes.NewReader(buffer)
+	img, _, err := image.DecodeConfig(fileBytes2)
+	if err != nil {
+		return
+	}
 
-	JSONFriendlyImageURL := "\"" + imageURL + "\""
+	imageURL := utils.GetTheFullS3BucketURL() + "/" + fileKey
 
 	err = database.GetSingleRecordNamedQuery(
 		&partnerImages,
-		`UPDATE users SET partners = partners || :img_url RETURNING partners;`,
-		map[string]interface{}{"img_url": JSONFriendlyImageURL},
+		`UPDATE users
+				SET partners = partners || (SELECT JSONB_BUILD_OBJECT(
+														   'imgURL', CAST(:img_url AS TEXT),
+														   'width', CAST(:width AS INT),
+														   'height', CAST(:height AS INT)
+												   ))
+				RETURNING partners;`,
+		map[string]interface{}{"img_url": imageURL, "width": img.Width, "height": img.Height},
 	)
 
 	return
