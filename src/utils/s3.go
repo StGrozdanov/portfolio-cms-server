@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"io"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -82,6 +85,46 @@ func UploadToS3(file *bytes.Reader, fileKey, contentType string) error {
 	}
 
 	return nil
+}
+
+// DownloadFromS3 downloads a file from the s3 bucket with the passed file name (file key)
+func DownloadFromS3(fileKey, localPath string) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	bucketKey := awsS3.s3BucketKey + "/" + fileKey
+
+	response, err := awsS3.client.GetObjectWithContext(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(awsS3.s3BucketName),
+		Key:    aws.String(bucketKey),
+	})
+	if err != nil {
+		return
+	}
+	defer response.Body.Close()
+
+	if err != nil {
+		if downloadError, ok := err.(awserr.Error); ok && downloadError.Code() == request.CanceledErrorCode {
+			return errors.New("upload canceled due to a timeout")
+		}
+		return fmt.Errorf("failed to download object from s3 - %s", err.Error())
+	}
+
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return
+	}
+
+	fullLocalPath := filepath.Join(currentDir, localPath)
+
+	file, err := os.Create(fullLocalPath)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, response.Body)
+	return
 }
 
 // DeleteFromS3 deletes a file from the s3 bucket with the passed file name (as a full URL from the DB)

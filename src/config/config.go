@@ -29,6 +29,8 @@ type configurations struct {
 	S3BucketURL    string `json:"s3_bucket_url" koanf:"S3_BUCKET_URL"`
 	AWSAccessKey   string `json:"aws_access_key" koanf:"AWS_ACCESS_KEY_ID"`
 	AWSSecretKey   string `json:"aws_secret_key" koanf:"AWS_SECRET_ACCESS_KEY"`
+
+	GeoFileKey string `json:"geo_file_key" koanf:"GEO_FILE_KEY"`
 }
 
 var (

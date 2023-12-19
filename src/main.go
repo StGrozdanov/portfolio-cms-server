@@ -37,6 +37,7 @@ func init() {
 	)
 
 	utils.GetJWTKey(app.JWTSecret)
+	server.SetGeoFileKey(app.GeoFileKey)
 }
 
 func main() {

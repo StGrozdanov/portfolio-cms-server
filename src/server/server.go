@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/oschwald/geoip2-golang"
 	log "github.com/sirupsen/logrus"
@@ -8,6 +9,8 @@ import (
 	"portfolio-cms-server/server/middlewares"
 	"portfolio-cms-server/utils"
 )
+
+var geoKey string
 
 func setupRouter(db *geoip2.Reader) (router *gin.Engine) {
 	gin.SetMode(gin.ReleaseMode)
@@ -58,7 +61,14 @@ func setupRouter(db *geoip2.Reader) (router *gin.Engine) {
 
 // Run defines the router endpoints and starts the server
 func Run() {
-	db, err := geoip2.Open("./GeoLite2-Country.mmdb")
+	geoFilePath := fmt.Sprintf("./%s", geoKey)
+
+	err := utils.DownloadFromS3(geoKey, geoFilePath)
+	if err != nil {
+		utils.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Failed to download geoip2 service file from s3")
+	}
+
+	db, err := geoip2.Open(geoFilePath)
 	if err != nil {
 		utils.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Unable to start geoip2 service")
 	}
@@ -72,4 +82,9 @@ func Run() {
 	}
 
 	utils.GetLogger().Debug("Web server started ...")
+}
+
+// SetGeoFileKey gets the Geo File Key and stores it in memory
+func SetGeoFileKey(key string) {
+	geoKey = key
 }
