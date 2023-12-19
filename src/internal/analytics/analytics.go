@@ -3,7 +3,10 @@ package analytics
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/mssola/user_agent"
 	"github.com/nleeper/goment"
+	"github.com/oschwald/geoip2-golang"
+	"net"
 	"portfolio-cms-server/database"
 	"strconv"
 	"time"
@@ -64,6 +67,54 @@ func Count() (count int, err error) {
 		`SELECT COALESCE(COUNT(id), 0) FROM analytics WHERE DATE(date_time) = :date;`,
 		map[string]interface{}{"date": date},
 	)
+	return
+}
+
+// Track retrieves request information such as client ip, referer, browser, device and country and stores it in the
+// database if not already written for the same day with the same ip (the visitations are counted as unique)
+func Track(db *geoip2.Reader, ctx *gin.Context, deviceType string) (err error) {
+	clientIP := ctx.ClientIP()
+	referer := ctx.Request.Referer()
+	userAgent := user_agent.New(ctx.Request.UserAgent())
+	browser, _ := userAgent.Browser()
+
+	record, err := db.Country(net.ParseIP(clientIP))
+	var country string
+
+	if err == nil {
+		country = record.Country.Names["en"]
+	} else {
+		country = "unknown"
+	}
+
+	dateNow, err := goment.New(time.Now())
+	if err != nil {
+		return
+	}
+
+	date := dateNow.UTC().Format("YYYY-MM-DD")
+
+	var exists bool
+
+	err = database.GetSingleRecordNamedQuery(
+		&exists,
+		`SELECT EXISTS (SELECT id FROM analytics WHERE date_time = :date AND ip_address = :ip)`,
+		map[string]interface{}{"date": date, "ip": clientIP},
+	)
+
+	if !exists {
+		_, err = database.ExecuteNamedQuery(
+			`INSERT INTO analytics (date_time, device_type, origin_country, ip_address, referer, browser)
+				VALUES (:date, :device, :country, :ip, :referer, :browser)`,
+			map[string]interface{}{
+				"date":    date,
+				"device":  deviceType,
+				"country": country,
+				"ip":      clientIP,
+				"referer": referer,
+				"browser": browser,
+			})
+	}
 	return
 }
 

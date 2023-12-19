@@ -2,13 +2,14 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/oschwald/geoip2-golang"
 	log "github.com/sirupsen/logrus"
 	"portfolio-cms-server/server/handlers"
 	"portfolio-cms-server/server/middlewares"
 	"portfolio-cms-server/utils"
 )
 
-func setupRouter() (router *gin.Engine) {
+func setupRouter(db *geoip2.Reader) (router *gin.Engine) {
 	gin.SetMode(gin.ReleaseMode)
 	router = gin.New()
 
@@ -26,6 +27,9 @@ func setupRouter() (router *gin.Engine) {
 	router.GET("/users/socials", handlers.GetSocials)
 	router.PUT("/users/socials", middlewares.AuthMiddleware(), handlers.UpdateSocials)
 	router.POST("/auth/login", handlers.Login)
+	router.POST("/analytics/track", func(ginCtx *gin.Context) {
+		handlers.Track(ginCtx, db)
+	})
 
 	fileAuthGroup := router.Group("/files")
 	fileAuthGroup.Use(middlewares.AuthMiddleware())
@@ -54,9 +58,15 @@ func setupRouter() (router *gin.Engine) {
 
 // Run defines the router endpoints and starts the server
 func Run() {
-	router := setupRouter()
+	db, err := geoip2.Open("./src/GeoLite2-Country.mmdb")
+	if err != nil {
+		utils.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Unable to start geoip2 service")
+	}
+	defer db.Close()
 
-	err := router.Run()
+	router := setupRouter(db)
+
+	err = router.Run()
 	if err != nil {
 		utils.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Unable to start web server")
 	}

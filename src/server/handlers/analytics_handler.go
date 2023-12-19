@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	validator "github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
+	"github.com/oschwald/geoip2-golang"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"portfolio-cms-server/internal/analytics"
@@ -63,4 +65,30 @@ func CountAnalytics(ginCtx *gin.Context) {
 		return
 	}
 	ginCtx.JSON(http.StatusOK, map[string]interface{}{"count": count})
+}
+
+func Track(ginCtx *gin.Context, db *geoip2.Reader) {
+	requestBody := analytics.UserDevice{}
+
+	if err := ginCtx.ShouldBind(&requestBody); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, map[string]interface{}{"error": "invalid parameters"})
+		return
+	}
+
+	if _, err := validator.ValidateStruct(requestBody); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, map[string]interface{}{"error": "invalid parameters"})
+		return
+	}
+
+	err := analytics.Track(db, ginCtx, requestBody.DeviceType)
+	if err != nil {
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on tracking user request")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusOK, map[string]interface{}{"status": "recorded"})
 }

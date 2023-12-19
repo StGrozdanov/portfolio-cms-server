@@ -13,3 +13,7 @@ type Analytic struct {
 	OriginCountry string `db:"origin_country" json:"originCountry"`
 	IpAddress     string `db:"ip_address" json:"ipAddress"`
 }
+
+type UserDevice struct {
+	DeviceType string `db:"device_type" json:"deviceType" valid:"required"`
+}
