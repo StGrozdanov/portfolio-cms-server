@@ -17,6 +17,7 @@ A custom CMS backend for my portfolio website built with Golang. You can find th
 - 📅 Moment 
 - 👨‍💻 Logrus
 - 🔦 Prometheus
+- 🪝 pre-commit and pre-push hooks
 
 ### Database
 
