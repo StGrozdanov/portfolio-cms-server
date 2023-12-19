@@ -58,7 +58,7 @@ func setupRouter(db *geoip2.Reader) (router *gin.Engine) {
 
 // Run defines the router endpoints and starts the server
 func Run() {
-	db, err := geoip2.Open("./src/GeoLite2-Country.mmdb")
+	db, err := geoip2.Open("./GeoLite2-Country.mmdb")
 	if err != nil {
 		utils.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Unable to start geoip2 service")
 	}
