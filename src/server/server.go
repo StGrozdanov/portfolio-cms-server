@@ -55,6 +55,9 @@ func setupRouter(db *geoip2.Reader) (router *gin.Engine) {
 	{
 		analyticsAuthGroup.GET("", handlers.GetAnalytics)
 		analyticsAuthGroup.GET("/count", handlers.CountAnalytics)
+		analyticsAuthGroup.GET("/country", handlers.GetAnalyticsByCountry)
+		analyticsAuthGroup.GET("/device", handlers.GetAnalyticsByDevice)
+		analyticsAuthGroup.GET("/browser", handlers.GetAnalyticsByBrowser)
 	}
 	return
 }
@@ -63,14 +66,19 @@ func setupRouter(db *geoip2.Reader) (router *gin.Engine) {
 func Run() {
 	geoFilePath := fmt.Sprintf("./%s", geoKey)
 
-	err := utils.DownloadFromS3(geoKey, geoFilePath)
-	if err != nil {
-		utils.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Failed to download geoip2 service file from s3")
-	}
-
 	db, err := geoip2.Open(geoFilePath)
 	if err != nil {
-		utils.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Unable to start geoip2 service")
+		utils.GetLogger().WithFields(log.Fields{"warn": err.Error()}).Warn("geoip2 service file was not found locally, downloading from s3")
+
+		err = utils.DownloadFromS3(geoKey, geoFilePath)
+		if err != nil {
+			utils.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Failed to download geoip2 service file from s3")
+		}
+
+		db, err = geoip2.Open(geoFilePath)
+		if err != nil {
+			utils.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Failed to open geoip2 service file")
+		}
 	}
 	defer db.Close()
 
