@@ -17,3 +17,19 @@ type Analytic struct {
 type UserDevice struct {
 	DeviceType string `db:"device_type" json:"deviceType" valid:"required"`
 }
+
+type ByCountry struct {
+	Country     string `db:"country" json:"country"`
+	CountryCode string `db:"code" json:"code"`
+	Count       int    `db:"count" json:"count"`
+}
+
+type ByBrowser struct {
+	Browser string `db:"browser" json:"browser"`
+	Count   int    `db:"count" json:"count"`
+}
+
+type ByDevice struct {
+	Device string `db:"device" json:"device"`
+	Count  int    `db:"count" json:"count"`
+}

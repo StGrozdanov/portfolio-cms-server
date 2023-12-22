@@ -73,18 +73,23 @@ func Count() (count int, err error) {
 // Track retrieves request information such as client ip, referer, browser, device and country and stores it in the
 // database if not already written for the same day with the same ip (the visitations are counted as unique)
 func Track(db *geoip2.Reader, ctx *gin.Context, deviceType string) (err error) {
-	clientIP := ctx.ClientIP()
-	referer := ctx.Request.Referer()
-	userAgent := user_agent.New(ctx.Request.UserAgent())
-	browser, _ := userAgent.Browser()
+	var (
+		country     string
+		countryCode string
+		clientIP    = ctx.ClientIP()
+		referer     = ctx.Request.Referer()
+		userAgent   = user_agent.New(ctx.Request.UserAgent())
+		browser, _  = userAgent.Browser()
+	)
 
 	record, err := db.Country(net.ParseIP(clientIP))
-	var country string
 
 	if err == nil {
 		country = record.Country.Names["en"]
+		countryCode = record.Country.IsoCode
 	} else {
 		country = "unknown"
+		countryCode = "unknown"
 	}
 
 	dateNow, err := goment.New(time.Now())
@@ -104,17 +109,56 @@ func Track(db *geoip2.Reader, ctx *gin.Context, deviceType string) (err error) {
 
 	if !exists {
 		_, err = database.ExecuteNamedQuery(
-			`INSERT INTO analytics (date_time, device_type, origin_country, ip_address, referer, browser)
-				VALUES (:date, :device, :country, :ip, :referer, :browser)`,
+			`INSERT INTO analytics (date_time, device_type, origin_country, ip_address, referer, browser, country_code)
+				VALUES (:date, :device, :country, :ip, :referer, :browser, :country_code)`,
 			map[string]interface{}{
-				"date":    date,
-				"device":  deviceType,
-				"country": country,
-				"ip":      clientIP,
-				"referer": referer,
-				"browser": browser,
+				"date":         date,
+				"device":       deviceType,
+				"country":      country,
+				"ip":           clientIP,
+				"referer":      referer,
+				"browser":      browser,
+				"country_code": countryCode,
 			})
 	}
+	return
+}
+
+// GetByCountry gets all analytics and groups them by country
+func GetByCountry() (analyticsByCountry []ByCountry, err error) {
+	err = database.GetMultipleRecords(&analyticsByCountry,
+		`SELECT origin_country AS country,
+					   country_code   AS code,
+					   COUNT(id)      AS count
+				FROM analytics
+				GROUP BY origin_country, country_code
+				ORDER BY count DESC;`,
+	)
+	return
+}
+
+// GetByBrowser gets all analytics and groups them by browser
+func GetByBrowser() (analyticsByBrowser []ByBrowser, err error) {
+	err = database.GetMultipleRecords(&analyticsByBrowser,
+		`SELECT browser,
+					   COUNT(id) AS count
+				FROM analytics
+				WHERE browser IS NOT NULL
+				GROUP BY browser
+				ORDER BY count DESC;`,
+	)
+	return
+}
+
+// GetByDevice gets all analytics and groups them by device
+func GetByDevice() (analyticsByDevice []ByDevice, err error) {
+	err = database.GetMultipleRecords(&analyticsByDevice,
+		`SELECT device_type AS device,
+					   COUNT(id)   AS count
+				FROM analytics
+				GROUP BY device_type
+				ORDER BY count DESC;`,
+	)
 	return
 }
 

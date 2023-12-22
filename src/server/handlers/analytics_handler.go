@@ -92,3 +92,45 @@ func Track(ginCtx *gin.Context, db *geoip2.Reader) {
 	}
 	ginCtx.JSON(http.StatusOK, map[string]interface{}{"status": "recorded"})
 }
+
+func GetAnalyticsByCountry(ginCtx *gin.Context) {
+	analyticsByCountry, err := analytics.GetByCountry()
+	if err != nil {
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on getting analytics")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusOK, map[string]interface{}{"analytics": analyticsByCountry})
+}
+
+func GetAnalyticsByDevice(ginCtx *gin.Context) {
+	analyticsByDevice, err := analytics.GetByDevice()
+	if err != nil {
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on getting analytics")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusOK, map[string]interface{}{"analytics": analyticsByDevice})
+}
+
+func GetAnalyticsByBrowser(ginCtx *gin.Context) {
+	analyticsByBrowser, err := analytics.GetByBrowser()
+	if err != nil {
+		utils.
+			GetLogger().
+			WithFields(log.Fields{"error": err.Error()}).
+			Error("Error on getting analytics")
+
+		ginCtx.JSON(http.StatusInternalServerError, map[string]interface{}{})
+		return
+	}
+	ginCtx.JSON(http.StatusOK, map[string]interface{}{"analytics": analyticsByBrowser})
+}
