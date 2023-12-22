@@ -45,10 +45,10 @@ func connect() {
 	sqlxConnection, err := sqlx.Open("postgres", psqlInfo)
 	if err == nil {
 		instance.DB = sqlxConnection
-		instance.DB.SetMaxOpenConns(10)
-		instance.DB.SetMaxIdleConns(10)
-		instance.DB.SetConnMaxIdleTime(30 * time.Second)
-		instance.DB.SetConnMaxLifetime(30 * time.Second)
+		instance.DB.SetMaxOpenConns(15)
+		instance.DB.SetMaxIdleConns(15)
+		instance.DB.SetConnMaxIdleTime(5 * time.Minute)
+		instance.DB.SetConnMaxLifetime(5 * time.Minute)
 	} else {
 		utils.GetLogger().WithFields(log.Fields{"error": err.Error()}).Error("Error on connection attempt to the Database")
 	}
