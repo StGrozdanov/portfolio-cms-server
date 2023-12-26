@@ -97,13 +97,13 @@ func Track(db *geoip2.Reader, ctx *gin.Context, deviceType string) (err error) {
 		return
 	}
 
-	date := dateNow.UTC().Format("YYYY-MM-DD")
+	date := dateNow.UTC().Format("YYYY-MM-DD HH:mm:ss")
 
 	var exists bool
 
 	err = database.GetSingleRecordNamedQuery(
 		&exists,
-		`SELECT EXISTS (SELECT id FROM analytics WHERE date_time = :date AND ip_address = :ip)`,
+		`SELECT EXISTS (SELECT id FROM analytics WHERE ip_address = :ip)`,
 		map[string]interface{}{"date": date, "ip": clientIP},
 	)
 
