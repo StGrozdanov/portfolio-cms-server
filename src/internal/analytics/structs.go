@@ -1,10 +1,13 @@
 package analytics
 
 type Analytics struct {
-	Results               []Analytic `db:"results" json:"results"`
-	TotalVisitationsCount int        `db:"total_visitations_count" json:"totalVisitationsCount"`
-	MostPopularCountry    string     `db:"most_popular_country" json:"mostPopularCountry"`
-	MostPopularDevice     string     `db:"most_popular_device" json:"mostPopularDevice"`
+	Results               []Analytic  `db:"results" json:"results"`
+	TotalVisitationsCount int         `db:"total_visitations_count" json:"totalVisitationsCount"`
+	MostPopularCountry    string      `db:"most_popular_country" json:"mostPopularCountry"`
+	MostPopularDevice     string      `db:"most_popular_device" json:"mostPopularDevice"`
+	VisitationsByCountry  []ByCountry `json:"visitationsByCountry"`
+	VisitationsByBrowser  []ByBrowser `json:"visitationsByBrowser"`
+	VisitationsByDevice   []ByDevice  `json:"visitationsByDevice"`
 }
 
 type Analytic struct {

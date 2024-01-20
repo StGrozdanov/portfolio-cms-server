@@ -126,7 +126,8 @@ func Track(db *geoip2.Reader, ctx *gin.Context, deviceType string) (err error) {
 
 // GetByCountry gets all analytics and groups them by country
 func GetByCountry() (analyticsByCountry []ByCountry, err error) {
-	err = database.GetMultipleRecords(&analyticsByCountry,
+	err = database.GetMultipleRecords(
+		&analyticsByCountry,
 		`SELECT origin_country AS country,
 					   country_code   AS code,
 					   COUNT(id)      AS count
@@ -240,6 +241,7 @@ func getAnalyticsForTheQuarter(quarter int) (analyticsResponse Analytics, err er
 	return getAnalyticsBetweenTheDatesQuery(startDate, endDate)
 }
 
+// nolint: funlen
 func getAnalyticsForTheDateQuery(date string) (analyticsResults Analytics, err error) {
 	err = database.GetMultipleRecordsNamedQuery(
 		&analyticsResults.Results,
@@ -274,9 +276,45 @@ func getAnalyticsForTheDateQuery(date string) (analyticsResults Analytics, err e
 		map[string]interface{}{"date": date},
 	)
 	analyticsResults.TotalVisitationsCount = len(analyticsResults.Results)
+
+	_ = database.GetMultipleRecordsNamedQuery(
+		&analyticsResults.VisitationsByCountry,
+		`SELECT origin_country AS country,
+					   country_code   AS code,
+					   COUNT(id)      AS count
+				FROM analytics
+				WHERE DATE(date_time) = :date
+				GROUP BY origin_country, country_code
+				ORDER BY count DESC;`,
+		map[string]interface{}{"date": date},
+	)
+
+	_ = database.GetMultipleRecordsNamedQuery(
+		&analyticsResults.VisitationsByBrowser,
+		`SELECT browser,
+					   COUNT(id) AS count
+				FROM analytics
+				WHERE browser IS NOT NULL AND DATE(date_time) = :date
+				GROUP BY browser
+				ORDER BY count DESC;`,
+		map[string]interface{}{"date": date},
+	)
+
+	_ = database.GetMultipleRecordsNamedQuery(
+		&analyticsResults.VisitationsByDevice,
+		`SELECT device_type AS device,
+					   COUNT(id)   AS count
+				FROM analytics
+				WHERE DATE(date_time) = :date
+				GROUP BY device_type
+				ORDER BY count DESC;`,
+		map[string]interface{}{"date": date},
+	)
+
 	return
 }
 
+// nolint: funlen
 func getAnalyticsBetweenTheDatesQuery(startDate, endDate string) (analyticsResults Analytics, err error) {
 	err = database.GetMultipleRecordsNamedQuery(
 		&analyticsResults.Results,
@@ -320,6 +358,49 @@ func getAnalyticsBetweenTheDatesQuery(startDate, endDate string) (analyticsResul
 		},
 	)
 	analyticsResults.TotalVisitationsCount = len(analyticsResults.Results)
+
+	_ = database.GetMultipleRecordsNamedQuery(
+		&analyticsResults.VisitationsByCountry,
+		`SELECT origin_country AS country,
+					   country_code   AS code,
+					   COUNT(id)      AS count
+				FROM analytics
+				WHERE DATE(date_time) BETWEEN :startDate AND :endDate
+				GROUP BY origin_country, country_code
+				ORDER BY count DESC;`,
+		map[string]interface{}{
+			"startDate": startDate,
+			"endDate":   endDate,
+		},
+	)
+
+	_ = database.GetMultipleRecordsNamedQuery(
+		&analyticsResults.VisitationsByBrowser,
+		`SELECT browser,
+					   COUNT(id) AS count
+				FROM analytics
+				WHERE browser IS NOT NULL AND DATE(date_time) BETWEEN :startDate AND :endDate
+				GROUP BY browser
+				ORDER BY count DESC;`,
+		map[string]interface{}{
+			"startDate": startDate,
+			"endDate":   endDate,
+		},
+	)
+
+	_ = database.GetMultipleRecordsNamedQuery(
+		&analyticsResults.VisitationsByDevice,
+		`SELECT device_type AS device,
+					   COUNT(id)   AS count
+				FROM analytics
+				WHERE DATE(date_time) BETWEEN :startDate AND :endDate
+				GROUP BY device_type
+				ORDER BY count DESC;`,
+		map[string]interface{}{
+			"startDate": startDate,
+			"endDate":   endDate,
+		},
+	)
 	return
 }
 
